@@ -1,36 +1,51 @@
 # Learning Forex Academy
 
-A responsive forex education platform for structured learning, chart education, quizzes and student progress tracking.
+Responsive forex education platform for structured lessons, chart education and student progress.
 
-## Current foundation
-- React + TypeScript + Vite frontend
-- Responsive student learning dashboard with illustrative sample data
-- FastAPI backend with a health endpoint
-- Environment-based backend configuration template
+## Stack
+- Frontend: React, TypeScript, Vite
+- API: FastAPI
+- Database: PostgreSQL (SQLite fallback for local quick-start)
+- Password storage: Argon2 password hashing
+- Authentication: signed JWT access tokens
+- Email: SMTP for verification and password reset links
 
 ## Run locally
+### API
+Python 3.11+ recommended.
+```bash
+python -m venv .venv
+# Windows: .venv\\Scripts\\activate
+# macOS/Linux: source .venv/bin/activate
+pip install -r backend/requirements.txt
+# Copy backend/.env.example to backend/.env and set JWT_SECRET
+uvicorn backend.main:app --reload --port 8000
+```
+If DATABASE_URL is not set, the API uses a local SQLite database. For PostgreSQL, set DATABASE_URL to a PostgreSQL connection string.
 
 ### Frontend
 ```bash
 npm install
 npm run dev
 ```
+Set VITE_API_URL in a root .env file if the API is not running at http://localhost:8000.
 
-### Backend
-Python 3.11+ is recommended.
-```bash
-python -m venv .venv
-# Windows: .venv\\Scripts\\activate
-# macOS/Linux: source .venv/bin/activate
-pip install -r backend/requirements.txt
-uvicorn backend.main:app --reload --port 8000
-```
-API health check: http://localhost:8000/api/health
+## Authentication endpoints
+- POST /api/auth/register
+- POST /api/auth/verify-email
+- POST /api/auth/login
+- GET /api/auth/me (Bearer token)
+- POST /api/auth/password-reset/request
+- POST /api/auth/password-reset/confirm
 
-## Planned delivery
-1. Web MVP: authentication, course management, lessons, quizzes, progress and admin tools.
-2. Offline-ready learning: cache selected materials for use without a connection.
-3. Android and iOS applications after validating the web MVP.
+Email verification is required before login. Configure SMTP settings in backend/.env to deliver verification and reset emails. In development without SMTP, the generated links are printed in the API terminal. Password reset requests always return a generic response to avoid disclosing whether an email is registered.
 
-## Scope note
-The current dashboard uses demonstration content only. Authentication, database persistence, email verification, password recovery, course authoring, quizzes and production deployment are not implemented yet. This is an educational platform, not a brokerage or trade-execution service. Forex trading involves substantial risk; educational content must not promise profits or guaranteed returns.
+## Security and production checklist
+- Set a long, random JWT_SECRET and keep all secrets in the hosting provider's environment settings.
+- Configure SMTP and the exact production frontend origin in CORS_ORIGINS and APP_URL.
+- Use managed PostgreSQL with encrypted connections and automated backups.
+- Use HTTPS in production.
+- Add database migrations (Alembic), rate limiting, monitoring and security testing before public launch.
+- Never commit real credentials or .env files.
+
+The current dashboard course/progress figures are sample UI data. Course authoring, quizzes, real progress persistence and admin management are later milestones. This is an educational platform, not a brokerage or trade execution service. Forex involves substantial risk; learning materials must not promise profits or guaranteed returns.
