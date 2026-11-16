@@ -1,7 +1,9 @@
 import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
+load_dotenv("backend/.env")
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./learning_forex.db")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
